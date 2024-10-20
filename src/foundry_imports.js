@@ -193,7 +193,15 @@ export function highlightMeasurementNative(
 		const point = canvas.grid.getTopLeftPoint(offset);
 		const center = canvas.grid.getCenterPoint(offset);
 		const pathUntilSpace = previousSegments.concat([{ray: new Ray(ray.A, center)}]);
-		const distance = sum(canvas.grid.measureDistances(pathUntilSpace, {gridSpaces: true}));
+		// Convert to waypoints -- there's probably a better way to do this
+		const waypoints = [];
+		for (let pathRay of pathUntilSpace) {
+			const rayPoints = (pathRay.ray.A == pathRay.ray.B) ? [pathRay.ray.A] : [pathRay.ray.A, pathRay.ray.B];
+			for (let p of rayPoints) {
+				waypoints.push({x: p.x, y: p.y});
+			}
+		}
+		const distance = canvas.grid.measurePath(waypoints, {gridSpaces: true}).distance;
 		const color = this.dragRulerGetColorForDistance(distance);
 		const snapPoint = getSnapPointForToken(point.x + 1, point.y + 1, this.draggedEntity);
 		const [snapX, snapY] = getGridPositionFromPixels(snapPoint.x + 1, snapPoint.y + 1);

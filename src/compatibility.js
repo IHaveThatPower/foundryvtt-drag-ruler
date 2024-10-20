@@ -44,7 +44,12 @@ export function measureDistances(segments, entity, shape, options = {}) {
 		if (!opts.ignoreGrid) {
 			opts.gridSpaces = true;
 		}
-		return canvas.grid.measureDistances(segments, opts);
+		const distances = [];
+		for (let pathRay of segments) {
+			const rayPoints = [{x: pathRay.ray.A.x, y: pathRay.ray.A.y}, {x: pathRay.ray.B.x, y: pathRay.ray.B.y}];
+			distances.push(canvas.grid.measurePath(rayPoints, opts).distance);
+		}
+		return distances;
 	}
 }
 

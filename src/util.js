@@ -88,7 +88,7 @@ export function getSnapPointForToken(x, y, token) {
 		return {x: snapX, y: snapY};
 	}
 
-	const [topLeftX, topLeftY] = canvas.grid.getTopLeft(x, y);
+	const topLeft = canvas.grid.getTopLeftPoint({x: x, y: y});
 	let cell = {};
 	if (token.document.width % 2 === 0) cell.x = x - canvas.grid.sizeY / 2;
 	else cell.x = x;
@@ -98,10 +98,10 @@ export function getSnapPointForToken(x, y, token) {
 	let snapX, snapY;
 	// Tiny tokens can snap to the cells corners
 	if (token.document.width <= 0.5) {
-		const offsetX = x - topLeftX;
+		const offsetX = x - topLeft.x;
 		const subGridWidth = Math.floor(canvas.grid.sizeX / 2);
 		const subGridPosX = Math.floor(offsetX / subGridWidth);
-		snapX = topLeftX + (subGridPosX + 0.5) * subGridWidth;
+		snapX = topLeft.x + (subGridPosX + 0.5) * subGridWidth;
 	}
 	// Tokens with odd multipliers (1x1, 3x3, ...) and tokens smaller than 1x1 but bigger than 0.5x0.5 snap to the center of the grid cell
 	else if (Math.round(token.document.width) % 2 === 1 || token.document.width < 1) {
@@ -112,10 +112,10 @@ export function getSnapPointForToken(x, y, token) {
 		snapX = center.x + canvas.grid.sizeX / 2;
 	}
 	if (token.document.height <= 0.5) {
-		const offsetY = y - topLeftY;
+		const offsetY = y - topLeft.y;
 		const subGridHeight = Math.floor(canvas.grid.h / 2);
 		const subGridPosY = Math.floor(offsetY / subGridHeight);
-		snapY = topLeftY + (subGridPosY + 0.5) * subGridHeight;
+		snapY = topLeft.y + (subGridPosY + 0.5) * subGridHeight;
 	} else if (Math.round(token.document.height) % 2 === 1 || token.document.height < 1) {
 		snapY = center.y;
 	} else {
@@ -142,12 +142,12 @@ export function getSnapPointForEntity(x, y, entity) {
 }
 
 export function highlightTokenShape(position, shape, color, alpha) {
-	const layer = canvas.grid.highlightLayers[this.name];
+	const layer = canvas.interface.grid.highlightLayers[this.name];
 	if (!layer) return false;
 	const area = getAreaFromPositionAndShape(position, shape);
 	for (const space of area) {
 		const [x, y] = getPixelsFromGridPosition(space.x, space.y);
-		canvas.grid.highlightGridPosition(layer, {x, y, color, alpha: 0.25 * alpha});
+		canvas.interface.grid.highlightPosition(layer.name, {x, y, color, alpha: 0.25 * alpha});
 	}
 }
 
